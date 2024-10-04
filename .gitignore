@@ -1,0 +1,8 @@
+Reading/
+General documents/
+**/Archive/
+**/Test datasets/
+**/Datasets/
+**/*.Rhistory
+**/*.Rproj
+**/*.Rproj.user/

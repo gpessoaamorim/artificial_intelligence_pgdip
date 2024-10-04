@@ -1,0 +1,543 @@
+---
+title: "Module 2: Data activities"
+author: "Guilherme Amorim"
+date: "2024-08-08"
+output: html_document
+---
+
+# Unit 1
+
+## Loading required packages
+
+### R
+```{r setup, include=T, echo=T, message=F}
+# module 2, unit 1
+# data activity 1.2 - levels of antisocial behaviour
+
+library(haven)
+library(skimr)
+library(tidyverse)
+```
+
+### Python
+
+```{python}
+# first install packages (from terminal)
+# pip3 install numpy
+
+# pip3 install pandas
+
+# pip3 install matplotlib 
+
+# pip3 install pyreadstat 
+
+import pandas as pd
+
+import numpy as np 
+
+import matplotlib.pyplot as plt
+
+
+
+```
+## Loading dataset 
+
+### R
+```{r, echo=T, message=F, warning=F}
+
+dataset <- read_sav("C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Datasets/8011spss_115789D2C668C0532E10DF66A3148DDB_V1/UKDA-8011-spss/spss/spss24/csew1314teachingopen.sav")
+
+str(dataset)
+```
+
+### Python
+
+```{python}
+
+dataset_python = pd.read_spss("C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Datasets/8011spss_115789D2C668C0532E10DF66A3148DDB_V1/UKDA-8011-spss/spss/spss24/csew1314teachingopen.sav")
+
+dataset_python.shape
+
+dataset_python.info()
+
+```
+
+
+## Summary stats for antisocial behaviour (antisocx)
+
+### R
+```{r}
+summary(dataset$antisocx)
+```
+Mean -0.01, median -0.18; data seems to be right skewed, and to take both positive and negative values; there are also a high proportion of missing values (76%)
+
+### Python
+
+```{python}
+
+# convert data into a dataframe (not required here)
+# df = pd.DataFrame(dataset_python)
+
+dataset_python["antisocx"].describe()
+
+
+
+```
+
+## Histogram
+
+### R
+```{r, message=F, warning=F}
+
+dataset %>%
+  ggplot() +
+geom_histogram(aes(antisocx),
+               color = "black")
+
+```
+The histogram confirms the previous observations, and shows that the most common values are those in the bucket with the lowest values
+
+
+### Python
+
+```{python}
+
+
+dataset_python["antisocx"].hist(edgecolor="black")
+plt.show() 
+
+```
+
+# Unit 2
+
+## Experience of crime in the previous year
+
+### R
+```{r}
+
+summary(dataset$bcsvictim)
+
+str(dataset$bcsvictim)
+
+# this variable is coded as numeric but represents a binary feature,
+# therefore I will reassign it as a factor to allow counting using table()
+
+dataset$bcsvictim <- as.factor(dataset$bcsvictim)
+
+str(dataset$bcsvictim)
+
+table(dataset$bcsvictim)
+```
+Out of 8843 respondents, 1383 (`r round(1383/8843*100,1)`%) experienced crime in the previous year (note that the `r round(1383/8843*100,1)`% value included above was inserted with in-line R code to perform that calculation within the document)
+
+### Python
+
+```{python}
+
+dataset_python['bcsvictim'].describe()
+
+
+dataset_python['bcsvictim'].dtypes
+# already coded as Categorical, so no need to recode (in opposition to R)
+
+# code to convert to factor (categorical) if needed
+# dataset_python['bcsvictim']=pd.Categorical(dataset_python['bcsvictim'])
+
+# dataset_python.bcsvictim
+
+dataset_python.bcsvictim.value_counts()
+
+```
+
+# Unit 3
+
+## "Create a subset of individuals who belong to the ‘75+’ age group and who were a ‘victim of crime’ that occurred in the previous 12 months. Save this dataset under a new name 'crime_75victim'.
+
+
+### R 
+
+```{r}
+
+head(dataset)
+
+str(dataset$agegrp7)
+
+output_directory<-"C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Outputs/"
+
+dataset %>%
+  filter(agegrp7 == 7,
+         bcsvictim == 1)%>%
+  write_csv(file = paste0(output_directory, "Datasets/R/crime_75victim.csv"))
+
+```
+
+### Python
+
+```{python}
+
+# general exploration of the data frame
+dataset_python.head()
+
+dataset_python.dtypes
+
+dataset_python.info()
+
+
+# exploration of the two columns to be used
+dataset_python.agegrp7.head()
+
+dataset_python.bcsvictim.head()
+
+# filter dataset and inspect results
+
+## method 1: filter based on dataframe column names
+dataset_python_crime75victim = dataset_python[(dataset_python.agegrp7 == "75+") & (dataset_python.bcsvictim == "Victim of crime")]
+
+dataset_python_crime75victim.shape
+
+## method 2: 'query' method
+dataset_python_crime75victim = dataset_python.query("agegrp7 == '75+' & bcsvictim == 'Victim of crime'")
+
+dataset_python_crime75victim.shape
+
+# save dataset
+
+output_directory="C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Outputs/"
+
+dataset_python_crime75victim.to_csv(output_directory + "Datasets/Python/crime_75victim.csv")
+
+
+```
+
+# Unit 5 - data activities
+
+## 1. Create a boxplot for the variable 'antisocx'
+
+### R (base)
+```{r}
+
+boxplot(dataset$antisocx,
+        main = "Levels of anti-social behaviour in neighbourhood ‘antisocx",
+        col = "purple",
+        outcol = "blue")
+
+
+```
+
+### R (ggplot)
+```{r}
+
+ggplot(dataset, aes(antisocx))+
+  geom_boxplot(fill="purple",
+               outlier.colour = "blue")+
+  labs(title="Levels of anti-social behaviour in neighbourhood ‘antisocx’")
+
+```
+
+### Python (pyplot)
+```{python, message=F}
+
+plt.boxplot(dataset_python.antisocx.dropna(),
+  patch_artist=True, 
+  boxprops=dict(facecolor="purple"),
+  flierprops=dict(markerfacecolor='blue')) # notice I had to drop NAs, otherwise this wouldn't plot
+
+plt.title("Levels of anti-social behaviour in neighbourhood ‘antisocx’")
+
+plt.show()
+
+
+```
+
+### Python (Seaborn)
+
+```{python}
+
+import seaborn as sb
+
+sb.boxplot(dataset_python.antisocx,
+color="purple",
+flierprops={"markerfacecolor": "blue"})
+
+plt.title("Levels of anti-social behaviour in neighbourhood ‘antisocx’")
+
+plt.show()
+
+```
+
+### Python (plotly)
+
+```{python}
+import plotly.express as px
+
+px.box(dataset_python,y="antisocx")
+   
+   
+
+```
+
+## 2. Create a bar plot using either the barplot() function or the ggplot() function to assess whether or not the survey respondents experienced crime in the 12 months prior to the survey (use the variable 'bcsvictim'). Give the graph a suitable title and choose a colour for the bars (e.g., orange).
+
+## R (base)
+```{r}
+
+barplot(table(as.factor(dataset$bcsvictim)),
+        col="orange",
+        main="Experience of crime in the previous year")
+
+```
+
+### R (ggplot)
+
+```{r}
+
+ggplot(dataset, aes(as.factor(bcsvictim)))+
+  geom_bar(fill="orange")+
+  labs(title="Experience of crime in the previous year",
+       x="bcsvictim")
+
+```
+
+### Python (pyplot)
+
+```{python,message=F}
+
+plt.bar(dataset_python.bcsvictim.value_counts().index,
+dataset_python.bcsvictim.value_counts().values,
+color="orange"
+)
+
+plt.title("Experience of crime in the previous year")
+
+
+plt.show()
+
+```
+
+
+### Python (Seaborn)
+
+```{python}
+
+sb.countplot(dataset_python,
+  x="bcsvictim",
+  color="orange")
+  
+plt.title("Experience of crime in the previous year")
+
+plt.show()
+
+```
+
+
+### Python (plotly)
+
+```{python}
+
+# px.bar(data=dataset_python.groupby('bcsvictim').count().reset_index(),x="bcsvictim",y="rowlabel",color="orange",title="Experience of crime in the previous year")
+
+
+
+
+```
+
+
+# Unit 5 -  notes activities
+
+## Barcharts
+
+### R
+
+```{r}
+
+barplot(
+  table(dataset$walkdark)
+)
+
+```
+
+```{r}
+
+
+# now after removing missing values
+
+barplot(
+  table(dataset$walkdark, useNA = "no")
+)
+
+```
+
+``` {r}
+# some customisation
+
+barplot(
+  table(dataset$walkdark, useNA = "no"),
+  main = "How safe respondents feel when walking alone after dark",
+  col = "darkblue"
+)
+
+```
+
+### Python
+
+``` {python}
+
+dataset_python.walkdark.value_counts().plot(kind="bar")
+
+plt.show()
+
+```
+
+
+``` {python}
+
+# alternative method
+
+plt.bar(list(dataset_python.walkdark.value_counts().index),dataset_python.walkdark.value_counts().values, color="green")
+
+plt.show()
+
+```
+## Histograms
+
+### R
+
+``` {r}
+
+hist(dataset$worryx,
+     breaks=20,
+     main="Worry about being victim of crime using 30 breaks", 
+     xlab = "level of worry about being victim")
+
+```
+
+
+### Python
+
+``` {python}
+
+dataset_python.worryx.hist(edgecolor="black", color="red", bins=20)
+plt.xlabel("level of worry about being victim")
+plt.title("Worry about being victim of crime")
+
+plt.show()
+
+```
+## Pie charts 
+
+### R
+
+```{r}
+data("mtcars")
+
+propcyl<-table(mtcars$cyl)
+
+pie(propcyl)
+
+write_csv(mtcars, "C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Datasets/mtcars.csv")
+```
+
+
+### Python
+
+```{python, message=F}
+
+mtcars=pd.read_csv("C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Datasets/mtcars.csv")
+
+mtcars.cyl.value_counts()
+
+sizes=mtcars.cyl.value_counts().values
+
+labels=mtcars.cyl.value_counts().index
+
+fig, ax = plt.subplots()
+ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+plt.show()
+
+```
+
+
+## Scatterplots
+
+### R
+
+```{r}
+
+plot(mtcars$wt, 
+     mtcars$mpg, 
+     main = "Scatter plot of weight versus mileage", 
+     xlab = "Weight (1000 lbs)", 
+     ylab = "miles per gallon")
+
+```
+
+### Python
+
+```{python}
+
+plt.scatter(mtcars.wt, mtcars.mpg)
+plt.title("Scatter plot of weight versus mileage")
+plt.xlabel("Weight (1000 lbs)")
+plt.ylabel("miles per gallon")
+plt.show()
+```
+
+## Boxplots
+
+### R
+
+```{r}
+boxplot(mtcars$mpg,
+        main= "Mileage per Gallon", 
+        ylab="Number of cars", 
+        col = "pink")
+```
+
+### Python
+
+```{python}
+fig = plt.boxplot(mtcars.mpg, patch_artist=True, boxprops=dict(facecolor="pink"))
+plt.title("Mileage per Gallon")
+plt.ylabel("Number of cars")
+plt.show()
+
+
+
+
+```
+
+## Line charts
+
+### R
+
+```{r}
+
+data(BOD)
+
+plot(BOD$Time, 
+     BOD$demand, 
+     type = "o", 
+     main = "Line graph for Biochemical Oxygen Demand", 
+     xlab = "Time", 
+     ylab ="Demand (mg per litre of water)")
+
+write_csv(BOD, "C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Datasets/BOD.csv")
+
+```
+
+### Python
+
+```{python}
+
+BOD=pd.read_csv("C:/Users/guilhermep/OneDrive - Nexus365/PgDip/Coding/Module 2/pgdip_module2_r_practice/Datasets/BOD.csv")
+
+plt.plot(BOD.Time,
+BOD.demand)
+
+plt.title("Line graph for Biochemical Oxygen Demand")
+plt.xlabel("Time")
+plt.ylabel("Demand (mg per litre of water)")
+plt.show()
+
+
+```

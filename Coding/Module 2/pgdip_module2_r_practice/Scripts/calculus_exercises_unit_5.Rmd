@@ -1,0 +1,126 @@
+# Calculus exercises (Unit 5)
+
+
+## Installation
+```{r installation, message=F, warning=F}
+
+# install.packages("mosaic")
+
+library(mosaic)
+
+```
+
+## First function
+
+```{r first function}
+
+f <- makeFun(
+    m * x + b ~ x,
+    m = 3.5,
+    b = 10)
+
+f(x = 2)
+
+
+
+```
+
+## Second function
+
+``` {r second function}
+
+g <- makeFun(A * x * cos(pi * x * y) ~ x + y, A = 3)
+g 
+
+
+```
+
+```{r second function (output)}
+
+
+g(x = 1, y = 2)
+
+```
+
+## Derivative functions
+
+i.e. curve tangent
+
+```{r derivative 1}
+D(expression(2*x^3),"x")
+
+
+
+```
+
+```{r derivative 2}
+D(expression(log(x)),"x")
+
+
+```
+
+```{r derivative 3}
+
+D(expression(a*exp(-b * x)),"x")
+
+
+```
+
+## Integratives
+
+i.e. area under the curve
+
+```{r integrative 1}
+
+integrate(dnorm,0,Inf)
+
+
+```
+
+```{r integrative 2}
+integrate(dnorm,-Inf,Inf)
+
+```
+
+```{r integrative 3}
+
+fun = function(x) rep(2, length(x))
+
+integrate(function(x) rep(2, length(x)), 0, 1)
+
+
+# correct default settings for plotting window
+# options(vsc.dev.args = list(width = 800, height = 600))
+
+```
+
+```{r function curve visualisation 1}
+
+# possible visualisations of the function curve
+## base R:
+plot(fun(0:10), type='l')
+
+```
+
+```{r function curve visualisation 2}
+curve(fun(x),0,10)
+
+
+
+```
+
+```{r function curve visualisation 3}
+## ggplot
+ggplot(data.frame(x=c(0, 10)), aes(x=x)) +
+ stat_function(fun=fun)
+
+
+```
+
+```{r integrative 4}
+
+integrand <-function(x) {1/((x+1)*sqrt(x))}
+integrate(integrand, lower = 0, upper = Inf)
+
+
+```

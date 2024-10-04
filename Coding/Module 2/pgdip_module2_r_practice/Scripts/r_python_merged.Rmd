@@ -1,0 +1,16 @@
+---
+title: "R+Python mixed notebook practice"
+author: "Guilherme Amorim"
+date: "2024-08-08"
+output: html_document
+---
+
+```{r setup, echo=T}
+print("This notebook allows me to code in R and Python within the same document. This chunk was coded in R")
+```
+
+```{python, echo=T}
+
+print("And this in Python")
+
+```
