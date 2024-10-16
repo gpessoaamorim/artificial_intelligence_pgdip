@@ -1,0 +1,26 @@
+---
+title: "Unit 12 activities"
+author: "Guilherme Amorim"
+date: "2024-10-16"
+output: html_document
+---
+
+# Unit 12 - Bayes’ Probability Activity
+
+## 1. A fair die with faces numbered from 1 to 6 is rolled. Calculate the probability that the die lands with an even number uppermost?
+
+The probability is equal to the number of favourable cases over the number of total cases, which equals 3/6 = 0.5
+
+
+## 2. Coronary heart disease (CHD) is currently the most common cause of death in the UK. In 2002, of 288 332 male deaths, 64 473 were from CHD, and of 318 463 female deaths, 53 003 were from CHD.
+
+Estimate the following probabilities.
+
+**- The probability that a randomly chosen UK man who dies in a future year will die of CHD.**  
+P= 64473/288332 = `r round(64473/288332*100,2)`%
+
+**- The probability that a randomly chosen UK woman who dies in a future year will die of CHD.**  
+P= 53003/318463 = `r round(53003/318463*100,2)`%
+
+**- How accurate are your estimates likely to be?**  
+Extremely accurate as they take into account all the population under study, with the possibility of small variations from one year to the other.

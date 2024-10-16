@@ -1,0 +1,160 @@
+---
+title: "PgDip Unit 7 activities"
+author: "Guilherme Amorim"
+date: "2024-10-16"
+output: html_document
+---
+
+# Unit 7 - notes activites (parametric tests)
+
+
+```{r setup, include=T, message=F}
+# initial setup
+
+
+library(haven)
+library(skimr)
+library(tidyverse)
+library(here)
+
+Health_Data<-read_sav(here("Datasets/Health Data.sav"))
+
+```
+
+
+```{python}
+# first install packages (from terminal)
+
+# pip3 install numpy
+
+# pip3 install pandas
+
+# pip3 install matplotlib 
+
+# pip3 install pyreadstat 
+
+import pandas as pd
+
+import numpy as np 
+
+import matplotlib.pyplot as plt
+
+from scipy import stats
+
+
+Health_Data_python = pd.read_spss("C:/Users/guilhermep/Documents/PgDip/Coding/Module 2/pgdip_module2_practice/Datasets/Health Data.sav")
+
+
+```
+
+
+
+
+## Normality testing (Shapiro-Wilk)
+
+### R
+
+```{r}
+
+
+shapiro.test(Health_Data$sbp)
+
+hist(Health_Data$sbp)
+
+```
+The null hypothesis of the Shapiro-Wilk test is that the data is normally distributed. A p-value of 3.345e-06 (<0.001) indicates that the null hypothesis was rejected at a 5% alpha, suggesting the data is non-normally distributed. This is confirmed by visual inspection of the histogram which shows a right-skewed distribution
+
+
+### Python
+
+```{python}
+
+
+stats.shapiro(Health_Data_python["sbp"])
+
+Health_Data_python["sbp"].hist(edgecolor="black")
+plt.show() 
+
+```
+Same results with Python code
+
+## t-tests
+
+### R 
+
+```{r}
+
+# One sample t-test
+res<-t.test(Health_Data$dbp, mu=80)
+print(res)
+
+```
+Mean: 82.77, reference value: 80, p-value <0.001, suggesting that the mean diastolic BP of participants in this sample is statistically significantly different from 80 at a significance level of 0.05
+
+```{r}
+# Independent (two-sample) t-test
+
+t.test(age~diabetes,data = Health_Data, var.equal=TRUE, alternative="less")
+
+
+```
+p-value 0.92, suggesting no statistically significant difference in age between diabetics and non-diabetics
+
+```{r}
+# Paired (two-sample) t-test
+
+res<-t.test(Health_Data$pre_test,Health_Data$post_test,paired = TRUE)
+res
+```
+p-value <0.001, showing a statistically significant difference in in mean scores before and after the training
+
+
+### Python
+
+```{python}
+# One sample t-test
+stats.ttest_1samp(Health_Data_python["dbp"], 80)
+
+```
+Same result with Python
+
+```{python}
+# Independent (two-sample) t-test
+
+stats.ttest_ind(Health_Data_python["age"][Health_Data_python["diabetes"]=="Yes"],Health_Data_python["age"][Health_Data_python["diabetes"]=="No"])
+
+```
+
+```{python}
+# Paired (two-sample) t-test
+stats.ttest_rel(Health_Data_python["pre_test"].dropna(),Health_Data_python["post_test"].dropna())
+
+```
+Same result with Python, but here NAs had to be dropped
+
+## Anova
+
+### R
+
+```{r}
+
+res.aov<-aov(income~religion_2, data = Health_Data)
+summary(res.aov)
+
+Health_Data%>%
+  group_by(religion_2)%>%
+  summarise(mean=mean(income))
+
+
+```
+The output suggests that there are statistically significant differences in mean income across the 4 religious groups included in the variable religion_2, but does not specify which.
+
+Upon further exploration, we can see that group 1 (MUSLIM) has a mean of 88180, group 2 (HINDU) 79166, group 3 (Christian) 79405, and group 4 (BUDDHISM) 84796
+
+### Python
+
+```{python}
+stats.f_oneway(Health_Data_python["income"][Health_Data_python["religion_2"]=="MUSLIM"], Health_Data_python["income"][Health_Data_python["religion_2"]=="HINDU"], Health_Data_python["income"][Health_Data_python["religion_2"]=="Christian"], Health_Data_python["income"][Health_Data_python["religion_2"]=="BUDDHISM"])
+```
+
+

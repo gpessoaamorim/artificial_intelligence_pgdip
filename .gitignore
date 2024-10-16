@@ -6,3 +6,4 @@ General documents/
 **/*.Rhistory
 **/*.Rproj
 **/*.Rproj.user/
+.Rproj.user

@@ -1,0 +1,329 @@
+---
+title: "Unit 8 activities"
+author: "Guilherme Amorim"
+date: "2024-10-16"
+output: html_document
+---
+
+
+```{r, include=T, message=F}
+# initial setup
+library(haven)
+library(skimr)
+library(tidyverse)
+library(here)
+
+
+Health_Data<-read_sav(here("Datasets/Health Data.sav"))
+
+```
+
+
+```{python}
+# first install packages (from terminal)
+
+# pip3 install numpy
+
+# pip3 install pandas
+
+# pip3 install matplotlib 
+
+# pip3 install pyreadstat 
+
+import pandas as pd
+
+import numpy as np 
+
+import matplotlib.pyplot as plt
+
+from scipy import stats
+
+
+Health_Data_python = pd.read_spss("C:/Users/guilhermep/Documents/PgDip/Coding/Module 2/pgdip_module2_practice/Datasets/Health Data.sav")
+
+
+```
+
+
+# Unit 8 notes - non-parametric tests
+
+## Mann-Whitney U (2 independent samples)
+
+### R
+
+Using Health data, we want to know whether the median systolic BP of males and females is same.
+
+```{r}
+
+
+wilcox.test(sbp~sex_1,Health_Data)
+
+
+```
+p-value 0.1682, therefore the null hypothesis cannot be rejected and we conclude that there is no statistically significant difference in median systolic BP between males and females.
+
+
+### Python
+
+```{python}
+
+stats.mannwhitneyu(Health_Data_python.sbp[Health_Data_python.sex=="Male"],Health_Data_python.sbp[Health_Data_python.sex=="Female"])
+
+```
+
+## Wilcoxon Signed Rank (2 paired samples)
+
+"The null hypothesis focuses on that there is no change in the post-test scores compared to the pre-test score due to the training."
+
+### R
+
+```{r}
+wilcox.test(Health_Data$pre_test, Health_Data$post_test, exact = FALSE, paired = TRUE)
+
+
+```
+p-value <0.001, therefore we reject the null hypothesis and conclude that there is a statistically significant change in post-test scores compared to the pre-test score due to the training.
+
+
+### Python
+
+```{python}
+
+stats.wilcoxon(Health_Data_python.pre_test.dropna(), Health_Data_python.post_test.dropna())
+```
+
+## Kruskal-Wallis test (>2 paired or unpaired samples)
+
+"The null hypothesis is that the systolic BP has  the same central tendency across the religious groups. (There is no difference in rank sums)."
+
+
+### R
+
+```{r}
+kruskal.test(sbp~religion, data = Health_Data)
+
+```
+p-value >0.05, therefore we fail to reject the null hypothesis and conclude that there is no statistically significant difference in systolic BP across religious groups.
+
+### Python
+
+```{python}
+
+stats.kruskal(Health_Data_python["sbp"][Health_Data_python["religion_2"]=="MUSLIM"], Health_Data_python["sbp"][Health_Data_python["religion_2"]=="HINDU"], Health_Data_python["sbp"][Health_Data_python["religion_2"]=="Christian"], Health_Data_python["sbp"][Health_Data_python["religion_2"]=="BUDDHISM"])
+
+```
+
+
+
+
+
+
+
+# Unit 8 - data activity
+
+1. Compute mean, median and mode of variables sbp, dbp and income
+2. Find out the five-figure summary of income variable and present it using a Boxplot
+3. Run a suitable hypothesis test to see if there is any association between systolic blood pressure and presence and absence of peptic ulcer.
+
+
+
+## R 
+
+```{r}
+
+## Compute mean, median and mode of variables sbp, dbp and income
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+   
+Health_Data%>%
+  select(sbp, dbp, income)%>%
+  pivot_longer(c(sbp, dbp, income), values_to = "value", names_to = "variable")%>%
+  group_by(variable)%>%
+  summarise(mean=mean(value),
+            median=median(value),
+            mode=getmode(value))
+
+```
+
+
+```{r}
+
+## Find out the five-figure summary of income variable and present it using a Boxplot
+
+Health_Data%>%
+  select(income)%>%
+  summarise(min=min(income),
+            Q1=quantile(income, 0.25),
+            median=median(income),
+            Q3=quantile(income, 0.75),
+            max=max(income))
+
+Health_Data%>%
+  ggplot(aes(income))+
+  geom_boxplot()+
+  coord_flip()
+
+
+```
+
+
+```{r}
+
+## Run a suitable hypothesis test to see if there is any association between systolic blood pressure and presence and absence of peptic ulcer.
+
+t.test(sbp~pepticulcer,data = Health_Data, var.equal=TRUE, alternative="less")
+
+```
+p-value 0.8985, suggesting no statistically significant difference in systolic blood pressure between people with and without peptic ulcer
+
+## Python
+```{python}
+## Compute mean, median and mode of variables sbp, dbp and income
+"SBP:"
+"Mean: "+ str(Health_Data_python["sbp"].mean())
+
+"Median: " +  str(Health_Data_python["sbp"].median())
+
+"Mode: " + str(stats.mode(Health_Data_python["sbp"]).mode)
+
+
+"DBP:"
+"Mean: "+ str(Health_Data_python["dbp"].mean())
+
+"Median: " +  str(Health_Data_python["dbp"].median())
+
+"Mode: " + str(stats.mode(Health_Data_python["dbp"]).mode)
+
+"Income:"
+"Mean: "+ str(Health_Data_python["income"].mean())
+
+"Median: " +  str(Health_Data_python["income"].median())
+
+"Mode: " + str(stats.mode(Health_Data_python["income"]).mode)
+
+```
+
+```{python}
+## Find out the five-figure summary of income variable and present it using a Boxplot
+print("Min:", Health_Data_python["income"].min())
+print("Q1:", np.percentile(Health_Data_python["income"],0.25))
+print("Median:", Health_Data_python["income"].median())
+print("Q3:", np.percentile(Health_Data_python["income"],0.75))
+print("Max:", Health_Data_python["income"].max())
+
+fig = plt.boxplot(Health_Data_python["income"])
+plt.show()
+
+```
+
+
+```{python}
+
+## Run a suitable hypothesis test to see if there is any association between systolic blood pressure and presence and absence of peptic ulcer.
+
+stats.ttest_ind(Health_Data_python["sbp"][Health_Data_python["pepticulcer"]=="Yes"],Health_Data_python["sbp"][Health_Data_python["pepticulcer"]=="No"])
+
+```
+
+# Unit 8 - scenario-based exercise (95% confidence interval)
+
+An HR organisation wishes to introduce a new set of training programs to increase the work efficiency of their employees. To do this, the organisation hires 3 vendors such that each vendor will train a group of employees with a one-week program. It is assumed that the employees across the three groups have same work efficiencies before the start of the program. The following table summarises the scores obtained post the one-week training. Each group has 8 employees.
+
+Now, find out the mean efficiency of each vendor and determine which vendor shows a higher significance of improvement in employee efficiency statistically at the 95% level.
+
+## R
+
+Visualise distributions
+
+
+```{r}
+# load data
+library(readxl)
+vendor_scores <- read_excel("~/PgDip/Coding/Module 2/pgdip_module2_practice/Datasets/vendor_scores.xlsx")
+
+vendor_scores%>%
+  pivot_longer(everything(), names_to = "vendor", values_to = "value")%>%
+  ggplot(aes(value, fill=vendor))+
+  geom_density()
+```
+
+Compute summary statistics
+
+```{r}
+vendor_scores%>%
+  pivot_longer(everything(), names_to = "vendor", values_to = "value")%>%
+  group_by(vendor)%>%
+  summarise(mean=mean(value),
+            sd=sd(value),
+            conf_int=paste0(round(mean-1.98*sd,2), "-", round(mean+1.98*sd,2)))
+
+```
+
+
+Compute ANOVA
+
+```{r}
+vendor_scores_pivoted<-vendor_scores%>%
+  pivot_longer(everything(), names_to = "vendor", values_to = "value")
+
+res.aov<-aov(value~vendor, data = vendor_scores_pivoted)
+summary(res.aov)
+
+```
+
+Based on the results above, vendor 2 shows a statistically significant higher improvement in employee efficiency after training at the 95% level.
+
+## Python
+
+Visualise distributions
+
+```{python}
+
+# load data
+vendor_scores = pd.read_excel("C:/Users/guilhermep/Documents/PgDip/Coding/Module 2/pgdip_module2_practice/Datasets/vendor_scores.xlsx")
+
+# load seaborn for visualisation
+import seaborn as sns
+
+
+
+vendor_scores["id"] = vendor_scores.index
+
+sns.displot(data=pd.melt(vendor_scores, id_vars="id", value_vars=["vendor1", "vendor2", "vendor3"]), x="value", hue="variable", kind="kde", fill=True)
+plt.show()
+
+# 
+
+```
+
+
+Compute summary statistics
+
+```{python}
+print("Means:")
+pd.melt(vendor_scores, id_vars="id", value_vars=["vendor1", "vendor2", "vendor3"]).groupby("variable").mean()
+
+print("SDs:")
+pd.melt(vendor_scores, id_vars="id", value_vars=["vendor1", "vendor2", "vendor3"]).groupby("variable").std()
+
+
+print("95% CIs:")
+print("Vendor 1: ", stats.t.interval(0.95, len(vendor_scores.vendor1)-1, loc=np.mean(vendor_scores.vendor1), scale=stats.sem(vendor_scores.vendor1)))
+
+
+print("Vendor 2: ", stats.t.interval(0.95, len(vendor_scores.vendor2)-1, loc=np.mean(vendor_scores.vendor2), scale=stats.sem(vendor_scores.vendor2)))
+
+
+print("Vendor 3: ", stats.t.interval(0.95, len(vendor_scores.vendor3)-1, loc=np.mean(vendor_scores.vendor3), scale=stats.sem(vendor_scores.vendor3)))
+
+```
+
+Compute anova
+
+```{python}
+stats.f_oneway(vendor_scores.vendor1,vendor_scores.vendor2,vendor_scores.vendor3)
+
+```
