@@ -2,7 +2,7 @@
 title: "PgDip Unit 7 activities"
 author: "Guilherme Amorim"
 date: "2024-10-16"
-output: html_document
+output: pdf_document
 ---
 
 # Unit 7 - notes activites (parametric tests)

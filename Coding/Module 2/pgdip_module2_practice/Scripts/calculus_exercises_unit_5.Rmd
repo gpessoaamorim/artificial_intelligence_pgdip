@@ -1,3 +1,10 @@
+---
+title: "Calculus exercises (Unit 5)"
+author: "Guilherme Amorim"
+date: "2024-10-16"
+output: pdf_document
+---
+
 # Calculus exercises (Unit 5)
 
 

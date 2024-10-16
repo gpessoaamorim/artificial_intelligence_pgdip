@@ -2,7 +2,7 @@
 title: "Unit 8 activities"
 author: "Guilherme Amorim"
 date: "2024-10-16"
-output: html_document
+output: pdf_document
 ---
 
 
