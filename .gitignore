@@ -7,3 +7,5 @@ General documents/
 **/*.Rproj
 **/*.Rproj.user/
 **/*.RData
+**/*.mp4
+**/Video/
